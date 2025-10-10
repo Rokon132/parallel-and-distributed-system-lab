@@ -9,7 +9,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
-
+// here is a simple TCP client implementation
 static std::string trim(const std::string& s){
     size_t b = s.find_first_not_of(" \t\r\n");
     if (b == std::string::npos) return "";
