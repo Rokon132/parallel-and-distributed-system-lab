@@ -1,0 +1,30 @@
+CLIENT = matrixOp_client
+SERVER = matrixOp_server
+
+COMMON_SRCS = matrixOp_xdr.c
+CLIENT_SRCS = matrixOp_client.c matrixOp_clnt.c $(COMMON_SRCS)
+SERVER_SRCS = matrixOp_server.c matrixOp_svc.c $(COMMON_SRCS)
+
+CLIENT_OBJS = $(CLIENT_SRCS:.c=.o)
+SERVER_OBJS = $(SERVER_SRCS:.c=.o)
+
+TIRPC_CFLAGS := $(shell pkg-config --cflags libtirpc 2>/dev/null)
+TIRPC_LIBS := $(shell pkg-config --libs libtirpc 2>/dev/null)
+
+CFLAGS ?= -O2
+CFLAGS += -Wall -Wextra -pedantic -std=c11
+CPPFLAGS += $(if $(TIRPC_CFLAGS),$(TIRPC_CFLAGS),-I/usr/include/tirpc)
+LDLIBS += $(if $(TIRPC_LIBS),$(TIRPC_LIBS),-ltirpc) -lm
+
+.PHONY: all clean
+
+all: $(CLIENT) $(SERVER)
+
+$(CLIENT): $(CLIENT_OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+
+$(SERVER): $(SERVER_OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
+
+clean:
+	$(RM) $(CLIENT_OBJS) $(SERVER_OBJS) $(CLIENT) $(SERVER)
